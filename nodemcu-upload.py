@@ -25,12 +25,11 @@ HEADER_CODE = [
                 'file.write(data)',
             'end',
         'end',
-        'file.open("_upload.lua", "w")',
 ]
 
 TRAILER_CODE = [
-        'file.close()',
         '_w=nil',
+        'collectgarbage()',
 ]
 
 def usage():
@@ -104,12 +103,10 @@ def upload_data(ser, filename, data):
     for chunk in chunk_it(data, CHUNK_SIZE):
         chunks.append(lua_encode(chunk))
 
-    serial_send(ser, HEADER_CODE)
-    print
+    serial_send(ser, ['file.remove("_upload.lua")', 'file.open("_upload.lua", "w")'])
     serial_send(ser, chunks)
-    print
-    serial_send(ser, TRAILER_CODE)
-    print
+    serial_send(ser, ['file.close()', 'collectgarbage()'])
+
     if filename == 'init.lua':
         serial_send(ser, ['file.remove("init.lua")', 'file.rename("_upload.lua","init.lua")'])
     elif filename.endswith('.lua'):
@@ -118,19 +115,26 @@ def upload_data(ser, filename, data):
         replace_file(ser, '_upload.lua', lcname)
     else:
         replace_file(ser, '_upload.lua', filename)
+    serial_send(ser, ['collectgarbage()'])
     
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         return usage()
-
-    f = file(sys.argv[1], 'r')
-    data = f.read()
-    f.close()
 
     #ser = serial.Serial(port, baudrate)
     ser = NetSerial(socket.create_connection( ('127.0.0.1', 9090) ))
 
-    upload_data(ser, os.path.basename(sys.argv[1]), data)
+    serial_send(ser, HEADER_CODE)
+    print
+    for filename in sys.argv[1:]:
+        f = file(filename, 'r')
+        data = f.read()
+        f.close()
+
+        upload_data(ser, os.path.basename(filename), data)
+    print
+    serial_send(ser, TRAILER_CODE)
+    print
 
 if __name__ == '__main__':
     main()
