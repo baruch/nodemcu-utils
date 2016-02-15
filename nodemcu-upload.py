@@ -86,6 +86,8 @@ def serial_send(ser, commands):
             raise BaseException()
         if s.find('NodeMCU ') != -1:
             raise BaseException()
+        if s.find('stack traceback:') != -1:
+            raise BaseException()
 
 def replace_file(ser, fromname, toname):
     serial_send(ser, ['file.remove("%s")' % toname, 'file.rename("%s", "%s")' % (fromname, toname)])
