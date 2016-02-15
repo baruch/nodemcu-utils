@@ -7,7 +7,7 @@ import socket
 
 port = '/dev/ttyUSB0'
 baudrate = 9600
-CHUNK_SIZE = 32
+CHUNK_SIZE = 16
 
 HEADER_CODE = [
         '_w=function(data, f1, f2)',
