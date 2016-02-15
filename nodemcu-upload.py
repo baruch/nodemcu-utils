@@ -112,7 +112,7 @@ def upload_data(ser, filename, data):
     elif filename.endswith('.lua'):
         lcname = filename[:-4] + '.lc'
         serial_send(ser, ['node.compile("_upload.lua")', 'file.remove("_upload.lua")'])
-        replace_file(ser, '_upload.lua', lcname)
+        replace_file(ser, '_upload.lc', lcname)
     else:
         replace_file(ser, '_upload.lua', filename)
     serial_send(ser, ['collectgarbage()'])
