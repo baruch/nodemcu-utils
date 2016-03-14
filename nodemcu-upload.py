@@ -119,7 +119,7 @@ def upload_data(ser, filename, data):
 
     serial_send(ser, ['file.remove("_upload.lua")', 'file.open("_upload.lua", "w")'])
     serial_send(ser, chunks)
-    serial_send(ser, ['file.close()', 'collectgarbage()'])
+    serial_send(ser, ['file.flush()', 'file.close()', 'collectgarbage()'])
 
     if filename == 'init.lua':
         serial_send(ser, ['file.remove("init.lua")', 'file.rename("_upload.lua","init.lua")'])
