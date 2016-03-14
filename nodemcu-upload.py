@@ -4,6 +4,7 @@ import sys
 import os
 import serial
 import socket
+import string
 
 port = '/dev/ttyUSB0'
 baudrate = 9600
@@ -59,8 +60,19 @@ def fletcher(data):
 
 def encode_data(data):
     s = ''
+    prev_escaped = False
     for ch in data:
-        s += '\%d' % ord(ch)
+        out = ch
+        if ch in string.ascii_letters:
+            prev_escaped = False
+        elif ch in string.digits and not prev_escaped:
+            prev_escaped = False
+        elif ch in (' ', '\t', '(', ')', ':', ',', ';', '.', '{', '}', '[', ']', '=', '-', '+', '*'):
+            prev_escaped = False
+        else:
+            out = '\%d' % ord(ch)
+            prev_escaped = True
+        s += out
     return s
 
 def lua_encode(data):
